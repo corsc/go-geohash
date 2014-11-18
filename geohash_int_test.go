@@ -29,6 +29,28 @@ func TestDecodeIntBasic(t *testing.T) {
 	}
 }
 
+func TestDecodeBboxInt(t *testing.T) {
+	var expectedMinLat float64 = 37.8324
+	var expectedMinLng float64 = 112.5584
+	var expectedMaxLat float64 = 37.8324
+	var expectedMaxLng float64 = 112.5584
+
+	minLat, minLng, maxLat, maxLng := DecodeBboxInt(4064984913515641, 52)
+
+	if math.Abs(expectedMinLat-minLat) > 0.0001 {
+		t.Errorf("Expected %+v but was %+v", expectedMinLat, minLat)
+	}
+	if math.Abs(expectedMinLng-minLng) > 0.0001 {
+		t.Errorf("Expected %+v but was %+v", expectedMinLng, minLng)
+	}
+	if math.Abs(expectedMaxLat-maxLat) > 0.0001 {
+		t.Errorf("Expected %+v but was %+v", expectedMaxLat, maxLat)
+	}
+	if math.Abs(expectedMaxLng-maxLng) > 0.0001 {
+		t.Errorf("Expected %+v but was %+v", expectedMaxLng, maxLng)
+	}
+}
+
 func TestNeighborInt(t *testing.T) {
 	result := NeighborInt(1702789509, North, 32)
 	var expected GeoHashInt = 1702789520

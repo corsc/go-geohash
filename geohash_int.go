@@ -52,6 +52,38 @@ var West = bearing{0, -1}
 // NorthWest bearing from reference point X
 var NorthWest = bearing{1, -1}
 
+// bitsToRadiusMap provides a mapping between bitDepth values and distances
+var bitsToRadiusMap []float64
+
+func init() {
+	bitsToRadiusMap = make([]float64, 25)
+	bitsToRadiusMap[0] = 0.5971
+	bitsToRadiusMap[1] = 1.1943
+	bitsToRadiusMap[2] = 2.3889
+	bitsToRadiusMap[3] = 4.7774
+	bitsToRadiusMap[4] = 9.5547
+	bitsToRadiusMap[5] = 19.1095
+	bitsToRadiusMap[6] = 38.2189
+	bitsToRadiusMap[7] = 76.4378
+	bitsToRadiusMap[8] = 152.8757
+	bitsToRadiusMap[9] = 305.751
+	bitsToRadiusMap[10] = 611.5028
+	bitsToRadiusMap[11] = 1223.0056
+	bitsToRadiusMap[12] = 2446.0112
+	bitsToRadiusMap[13] = 4892.0224
+	bitsToRadiusMap[14] = 9784.0449
+	bitsToRadiusMap[15] = 19568.0898
+	bitsToRadiusMap[16] = 39136.1797
+	bitsToRadiusMap[17] = 78272.35938
+	bitsToRadiusMap[18] = 156544.7188
+	bitsToRadiusMap[19] = 313089.4375
+	bitsToRadiusMap[20] = 626178.875
+	bitsToRadiusMap[21] = 1252357.75
+	bitsToRadiusMap[22] = 2504715.5
+	bitsToRadiusMap[23] = 5009431
+	bitsToRadiusMap[24] = 10018863
+}
+
 // EncodeInt will encode a pair of latitude and longitude values into a geohash integer.
 //
 // The third argument is the bitDepth of this number, which affects the precision of the geohash
@@ -63,10 +95,10 @@ func EncodeInt(latitude float64, longitude float64, bitDepth int64) (geohash Geo
 	// initialize the calculation
 	var bitsTotal int64
 	var mid float64
-	var maxLat float64 = 90
-	var minLat float64 = -90
-	var maxLng float64 = 180
-	var minLng float64 = -180
+	var maxLat float64 = 90.0
+	var minLat float64 = -90.0
+	var maxLng float64 = 180.0
+	var minLng float64 = -180.0
 
 	for bitsTotal < bitDepth {
 		geohash *= 2
@@ -214,6 +246,16 @@ func getBit(geohash GeoHashInt, position int64) (bit int64) {
 	return int64(int((float64(geohash) / math.Pow(float64(2), float64(position)))) & 0x01)
 }
 
+// FindBitDepth will attempt to find the maximum bitdepth which contains the supplied distance
+func FindBitDepth(distance float64) (bitDepth int64) {
+	for key, value := range bitsToRadiusMap {
+		if value > distance {
+			return MaxBitDepth - (int64(key) * 2)
+		}
+	}
+	return
+}
+
 // Shift provides a convenient way to convert from MaxBitDepth to another
 func Shift(value GeoHashInt, bitDepth int64) (output GeoHashInt) {
 	// input validation
@@ -225,10 +267,10 @@ func Shift(value GeoHashInt, bitDepth int64) (output GeoHashInt) {
 // validateBitDepth will ensure the supplied bitDepth is valid or cause panic() otherwise.
 func validateBitDepth(bitDepth int64) {
 	if bitDepth > MaxBitDepth || bitDepth <= 0 {
-		panic(fmt.Sprintf("bitDepth must be greater than 0 and less than %d", MaxBitDepth))
+		panic(fmt.Sprintf("bitDepth must be greater than 0 and less than or equal to %d, was %d", MaxBitDepth, bitDepth))
 	}
 	if math.Mod(float64(bitDepth), float64(2)) != 0 {
-		panic("bitDepth must be even")
+		panic(fmt.Sprintf("bitDepth must be even, was %d", bitDepth))
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 func TestEncodeIntBasic(t *testing.T) {
 	var expected GeoHashInt = 4064984913515641
 
-	result := EncodeInt(37.8324, 112.5584, 52)
+	result := EncodeInt(37.8324, 112.5584, MaxBitDepth)
 
 	if expected != result {
 		t.Errorf("Expected %+v but was %+v", expected, result)
@@ -19,7 +19,7 @@ func TestDecodeIntBasic(t *testing.T) {
 	var expectedLat float64 = 37.8324
 	var expectedLng float64 = 112.5584
 
-	resultLat, resultLng, _, _ := DecodeInt(4064984913515641, 52)
+	resultLat, resultLng, _, _ := DecodeInt(4064984913515641, MaxBitDepth)
 
 	if math.Abs(expectedLat-resultLat) > 0.0001 {
 		t.Errorf("Expected %+v but was %+v", expectedLat, resultLat)
@@ -35,7 +35,7 @@ func TestDecodeBboxInt(t *testing.T) {
 	var expectedMaxLat float64 = 37.8324
 	var expectedMaxLng float64 = 112.5584
 
-	minLat, minLng, maxLat, maxLng := DecodeBboxInt(4064984913515641, 52)
+	minLat, minLng, maxLat, maxLng := DecodeBboxInt(4064984913515641, MaxBitDepth)
 
 	if math.Abs(expectedMinLat-minLat) > 0.0001 {
 		t.Errorf("Expected %+v but was %+v", expectedMinLat, minLat)

@@ -1,17 +1,14 @@
 package geohash
 
 import (
-	"math"
 	"fmt"
+	"math"
 )
 
 const (
 	// MaxBitDepth defines both the maximum and default geohash accuracy.
 	MaxBitDepth int64 = 52
 )
-
-// GeoHashInt is a custom type representing a GeoHash as integer
-type GeoHashInt int64
 
 // bearing defines the compass bearing/direction in matrix form relative to a center point of 0,0
 //  |----------------------|
@@ -88,7 +85,7 @@ func init() {
 //
 // The third argument is the bitDepth of this number, which affects the precision of the geohash
 // but also must be used consistently when decoding. Bit depth must be even.
-func EncodeInt(latitude float64, longitude float64, bitDepth int64) (geohash GeoHashInt) {
+func EncodeInt(latitude float64, longitude float64, bitDepth int64) int64 {
 	// input validation
 	validateBitDepth(bitDepth)
 
@@ -100,11 +97,12 @@ func EncodeInt(latitude float64, longitude float64, bitDepth int64) (geohash Geo
 	var maxLng float64 = 180.0
 	var minLng float64 = -180.0
 
+	var geohash int64
 	for bitsTotal < bitDepth {
 		geohash *= 2
 
 		if bitsTotal%2 == 0 {
-			mid = (maxLng+minLng)/2
+			mid = (maxLng + minLng) / 2
 
 			if longitude > mid {
 				geohash += 1
@@ -113,8 +111,8 @@ func EncodeInt(latitude float64, longitude float64, bitDepth int64) (geohash Geo
 				maxLng = mid
 			}
 		} else {
-			mid = (maxLat+minLat)/2
-			if (latitude > mid) {
+			mid = (maxLat + minLat) / 2
+			if latitude > mid {
 				geohash += 1
 				minLat = mid
 			} else {
@@ -123,7 +121,7 @@ func EncodeInt(latitude float64, longitude float64, bitDepth int64) (geohash Geo
 		}
 		bitsTotal++
 	}
-	return
+	return geohash
 }
 
 // DecodeInt with decode a integer geohashed number into pair of latitude and longitude value approximations.
@@ -133,22 +131,22 @@ func EncodeInt(latitude float64, longitude float64, bitDepth int64) (geohash Geo
 // The size of the area returned will be vary with different bitDepth settings.
 //
 // Note: You should provide the same bitDepth to decode the number as was used to produce the geohash originally.
-func DecodeInt(geohash GeoHashInt, bitDepth int64) (lat float64, lng float64, latErr float64, lngErr float64) {
+func DecodeInt(geohash int64, bitDepth int64) (lat float64, lng float64, latErr float64, lngErr float64) {
 	// input validation
 	validateBitDepth(bitDepth)
 
 	minLat, minLng, maxLat, maxLng := DecodeBboxInt(geohash, bitDepth)
-	lat = (minLat+maxLat)/2
-	lng = (minLng+maxLng)/2
-	latErr = maxLat-lat
-	lngErr = maxLng-lng
+	lat = (minLat + maxLat) / 2
+	lng = (minLng + maxLng) / 2
+	latErr = maxLat - lat
+	lngErr = maxLng - lng
 	return
 }
 
 // DecodeBboxInt will decode a geohash integer into the bounding box that matches it.
 //
 // Returned as a four corners of a square region.
-func DecodeBboxInt(geohash GeoHashInt, bitDepth int64) (minLat float64, minLng float64, maxLat float64, maxLng float64) {
+func DecodeBboxInt(geohash int64, bitDepth int64) (minLat float64, minLng float64, maxLat float64, maxLng float64) {
 	// input validation
 	validateBitDepth(bitDepth)
 
@@ -166,16 +164,16 @@ func DecodeBboxInt(geohash GeoHashInt, bitDepth int64) (minLat float64, minLng f
 		lonBit = getBit(geohash, ((steps-thisStep)*2)-1)
 		latBit = getBit(geohash, ((steps-thisStep)*2)-2)
 
-		if (latBit == 0) {
-			maxLat = (maxLat+minLat)/2
+		if latBit == 0 {
+			maxLat = (maxLat + minLat) / 2
 		} else {
-			minLat = (maxLat+minLat)/2
+			minLat = (maxLat + minLat) / 2
 		}
 
-		if (lonBit == 0) {
-			maxLng = (maxLng+minLng)/2
+		if lonBit == 0 {
+			maxLng = (maxLng + minLng) / 2
 		} else {
-			minLng = (maxLng+minLng)/2
+			minLng = (maxLng + minLng) / 2
 		}
 	}
 
@@ -185,22 +183,22 @@ func DecodeBboxInt(geohash GeoHashInt, bitDepth int64) (minLat float64, minLng f
 // NeighborInt will find the neighbor of a integer geohash in certain bearing/direction.
 //
 // The bitDepth should be specified and the same as the value used to generate the hash.
-func NeighborInt(geohash GeoHashInt, bearing bearing, bitDepth int64) (output GeoHashInt) {
+func NeighborInt(geohash int64, bearing bearing, bitDepth int64) int64 {
 	// input validation
 	validateBitDepth(bitDepth)
 
 	lat, lng, latErr, lngErr := DecodeInt(geohash, bitDepth)
-	neighborLat := lat + float64(bearing.x) * latErr * 2
-	neighborLng := lng + float64(bearing.y) * lngErr * 2
-	output = EncodeInt(neighborLat, neighborLng, bitDepth)
-	return
+	neighborLat := lat + float64(bearing.x)*latErr*2
+	neighborLng := lng + float64(bearing.y)*lngErr*2
+	return EncodeInt(neighborLat, neighborLng, bitDepth)
 }
 
 // NeighborsInt is the same as calling NeighborInt for each direction and will return all 8 neighbors and the center location.
-func NeighborsInt(geohash GeoHashInt, bitDepth int64) (output[] GeoHashInt) {
+func NeighborsInt(geohash int64, bitDepth int64) []int64 {
 	// input validation
 	validateBitDepth(bitDepth)
 
+	var output []int64
 	output = append(output, NeighborInt(geohash, North, bitDepth))
 	output = append(output, NeighborInt(geohash, NorthEast, bitDepth))
 	output = append(output, NeighborInt(geohash, East, bitDepth))
@@ -210,11 +208,11 @@ func NeighborsInt(geohash GeoHashInt, bitDepth int64) (output[] GeoHashInt) {
 	output = append(output, NeighborInt(geohash, West, bitDepth))
 	output = append(output, NeighborInt(geohash, NorthWest, bitDepth))
 	output = append(output, geohash)
-	return
+	return output
 }
 
 // BboxesInt will return all the hash integers between minLat, minLon, maxLat, maxLon at the requested bitDepth
-func BboxesInt(minLat float64, minLon float64, maxLat float64, maxLon float64, bitDepth int64) (output[] GeoHashInt) {
+func BboxesInt(minLat float64, minLon float64, maxLat float64, maxLon float64, bitDepth int64) []int64 {
 	// input validation
 	validateBitDepth(bitDepth)
 
@@ -229,39 +227,39 @@ func BboxesInt(minLat float64, minLon float64, maxLat float64, maxLon float64, b
 	swMinLat, _, _, swMaxLng := DecodeBboxInt(hashSouthWest, bitDepth)
 	neMinLat, _, _, neMaxLng := DecodeBboxInt(hashNorthEast, bitDepth)
 
-	latStep := round((neMinLat - swMinLat) / perLat, 0.5, 0)
-	lngStep := round((neMaxLng - swMaxLng) / perLng, 0.5, 0)
+	latStep := round((neMinLat-swMinLat)/perLat, 0.5, 0)
+	lngStep := round((neMaxLng-swMaxLng)/perLng, 0.5, 0)
 
-	for lat := 0 ; lat <= int(latStep) ; lat++ {
-		for lng := 0 ; lng <= int(lngStep) ; lng++ {
+	var output []int64
+	for lat := 0; lat <= int(latStep); lat++ {
+		for lng := 0; lng <= int(lngStep); lng++ {
 			output = append(output, NeighborInt(hashSouthWest, bearing{lat, lng}, bitDepth))
 		}
 	}
-
-	return
+	return output
 }
 
 // getBit returns the bit at the requested location
-func getBit(geohash GeoHashInt, position int64) (bit int64) {
+func getBit(geohash int64, position int64) int64 {
 	return int64(int((float64(geohash) / math.Pow(float64(2), float64(position)))) & 0x01)
 }
 
 // FindBitDepth will attempt to find the maximum bitdepth which contains the supplied distance
-func FindBitDepth(distance float64) (bitDepth int64) {
+func FindBitDepth(distance float64) int64 {
 	for key, value := range bitsToRadiusMap {
 		if value > distance {
 			return MaxBitDepth - (int64(key) * 2)
 		}
 	}
-	return
+	return 0
 }
 
 // Shift provides a convenient way to convert from MaxBitDepth to another
-func Shift(value GeoHashInt, bitDepth int64) (output GeoHashInt) {
+func Shift(value int64, bitDepth int64) int64 {
 	// input validation
 	validateBitDepth(bitDepth)
 
-	return value << uint64(MaxBitDepth - bitDepth)
+	return value << uint64(MaxBitDepth-bitDepth)
 }
 
 // validateBitDepth will ensure the supplied bitDepth is valid or cause panic() otherwise.
@@ -275,7 +273,7 @@ func validateBitDepth(bitDepth int64) {
 }
 
 // round is the "missing" round function from the math lib
-func round(val float64, roundOn float64, places int) (newVal float64) {
+func round(val float64, roundOn float64, places int) float64 {
 	var round float64
 	pow := math.Pow(10, float64(places))
 	digit := pow * val
@@ -287,6 +285,5 @@ func round(val float64, roundOn float64, places int) (newVal float64) {
 	} else {
 		round = math.Floor(digit)
 	}
-	newVal = round/pow
-	return
+	return round / pow
 }

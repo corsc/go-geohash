@@ -1,12 +1,12 @@
 package geohash
 
 import (
-	"testing"
 	"math"
+	"testing"
 )
 
 func TestEncodeIntBasic(t *testing.T) {
-	var expected GeoHashInt = 4064984913515641
+	var expected int64 = 4064984913515641
 
 	result := EncodeInt(37.8324, 112.5584, MaxBitDepth)
 
@@ -53,7 +53,7 @@ func TestDecodeBboxInt(t *testing.T) {
 
 func TestNeighborInt(t *testing.T) {
 	result := NeighborInt(1702789509, North, 32)
-	var expected GeoHashInt = 1702789520
+	var expected int64 = 1702789520
 	if expected != result {
 		t.Errorf("Expected %+v but was %+v", expected, result)
 	}
@@ -66,7 +66,7 @@ func TestNeighborInt(t *testing.T) {
 }
 
 func TestNeighborsInt(t *testing.T) {
-	expected := []GeoHashInt{1702789520, 1702789522, 1702789511, 1702789510, 1702789508, 1702789422, 1702789423, 1702789434, 1702789509}
+	expected := []int64{1702789520, 1702789522, 1702789511, 1702789510, 1702789508, 1702789422, 1702789423, 1702789434, 1702789509}
 	results := NeighborsInt(1702789509, 32)
 
 	for _, expectedValue := range expected {
@@ -82,8 +82,8 @@ func TestNeighborsInt(t *testing.T) {
 	}
 }
 
-func TestBBoxesInt(t * testing.T) {
-	results := BboxesInt(30, 120, 30.0001, 120.0001, 50);
+func TestBBoxesInt(t *testing.T) {
+	results := BboxesInt(30, 120, 30.0001, 120.0001, 50)
 	expected := EncodeInt(30.0001, 120.0001, 50)
 
 	found := false

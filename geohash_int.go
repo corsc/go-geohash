@@ -247,7 +247,7 @@ func getBit(geohash int64, position int64) int64 {
 // FindBitDepth will attempt to find the maximum bitdepth which contains the supplied distance
 func FindBitDepth(distanceMeters float64) int64 {
 	for key, value := range bitsToDistanceInMeters {
-		if value > distance {
+		if value > distanceMeters {
 			return MaxBitDepth - (int64(key) * 2)
 		}
 	}

@@ -49,36 +49,36 @@ var West = bearing{0, -1}
 // NorthWest bearing from reference point X
 var NorthWest = bearing{1, -1}
 
-// bitsToRadiusMap provides a mapping between bitDepth values and distances
-var bitsToRadiusMap []float64
+// bitsToDistanceInMeters provides a mapping between bitDepth values and distances
+var bitsToDistanceInMeters []float64
 
 func init() {
-	bitsToRadiusMap = make([]float64, 25)
-	bitsToRadiusMap[0] = 0.5971
-	bitsToRadiusMap[1] = 1.1943
-	bitsToRadiusMap[2] = 2.3889
-	bitsToRadiusMap[3] = 4.7774
-	bitsToRadiusMap[4] = 9.5547
-	bitsToRadiusMap[5] = 19.1095
-	bitsToRadiusMap[6] = 38.2189
-	bitsToRadiusMap[7] = 76.4378
-	bitsToRadiusMap[8] = 152.8757
-	bitsToRadiusMap[9] = 305.751
-	bitsToRadiusMap[10] = 611.5028
-	bitsToRadiusMap[11] = 1223.0056
-	bitsToRadiusMap[12] = 2446.0112
-	bitsToRadiusMap[13] = 4892.0224
-	bitsToRadiusMap[14] = 9784.0449
-	bitsToRadiusMap[15] = 19568.0898
-	bitsToRadiusMap[16] = 39136.1797
-	bitsToRadiusMap[17] = 78272.35938
-	bitsToRadiusMap[18] = 156544.7188
-	bitsToRadiusMap[19] = 313089.4375
-	bitsToRadiusMap[20] = 626178.875
-	bitsToRadiusMap[21] = 1252357.75
-	bitsToRadiusMap[22] = 2504715.5
-	bitsToRadiusMap[23] = 5009431
-	bitsToRadiusMap[24] = 10018863
+	bitsToDistanceInMeters = make([]float64, 25)
+	bitsToDistanceInMeters[0] = 0.5971
+	bitsToDistanceInMeters[1] = 1.1943
+	bitsToDistanceInMeters[2] = 2.3889
+	bitsToDistanceInMeters[3] = 4.7774
+	bitsToDistanceInMeters[4] = 9.5547
+	bitsToDistanceInMeters[5] = 19.1095
+	bitsToDistanceInMeters[6] = 38.2189
+	bitsToDistanceInMeters[7] = 76.4378
+	bitsToDistanceInMeters[8] = 152.8757
+	bitsToDistanceInMeters[9] = 305.751
+	bitsToDistanceInMeters[10] = 611.5028
+	bitsToDistanceInMeters[11] = 1223.0056
+	bitsToDistanceInMeters[12] = 2446.0112
+	bitsToDistanceInMeters[13] = 4892.0224
+	bitsToDistanceInMeters[14] = 9784.0449
+	bitsToDistanceInMeters[15] = 19568.0898
+	bitsToDistanceInMeters[16] = 39136.1797
+	bitsToDistanceInMeters[17] = 78272.35938
+	bitsToDistanceInMeters[18] = 156544.7188
+	bitsToDistanceInMeters[19] = 313089.4375
+	bitsToDistanceInMeters[20] = 626178.875
+	bitsToDistanceInMeters[21] = 1252357.75
+	bitsToDistanceInMeters[22] = 2504715.5
+	bitsToDistanceInMeters[23] = 5009431
+	bitsToDistanceInMeters[24] = 10018863
 }
 
 // EncodeInt will encode a pair of latitude and longitude values into a geohash integer.
@@ -245,8 +245,8 @@ func getBit(geohash int64, position int64) int64 {
 }
 
 // FindBitDepth will attempt to find the maximum bitdepth which contains the supplied distance
-func FindBitDepth(distance float64) int64 {
-	for key, value := range bitsToRadiusMap {
+func FindBitDepth(distanceMeters float64) int64 {
+	for key, value := range bitsToDistanceInMeters {
 		if value > distance {
 			return MaxBitDepth - (int64(key) * 2)
 		}

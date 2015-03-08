@@ -53,6 +53,7 @@ var NorthWest = bearing{1, -1}
 var bitsToDistanceInMeters []float64
 
 func init() {
+	// Reference: https://github.com/yinqiwen/ardb/blob/master/doc/spatial-index.md
 	bitsToDistanceInMeters = make([]float64, 25)
 	bitsToDistanceInMeters[0] = 0.5971
 	bitsToDistanceInMeters[1] = 1.1943

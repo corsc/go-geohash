@@ -241,7 +241,7 @@ func BboxesInt(minLat float64, minLon float64, maxLat float64, maxLon float64, b
 
 // getBit returns the bit at the requested location
 func getBit(geohash int64, position int64) int64 {
-	return int64(int((float64(geohash) / math.Pow(float64(2), float64(position)))) & 0x01)
+	return int64((uint64(geohash) >> uint64(position))) & 0x1
 }
 
 // FindBitDepth will attempt to find the maximum bitdepth which contains the supplied distance

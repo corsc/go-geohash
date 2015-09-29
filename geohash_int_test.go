@@ -2,6 +2,7 @@ package geohash
 
 import (
 	"math"
+	"math/rand"
 	"testing"
 )
 
@@ -94,5 +95,19 @@ func TestBBoxesInt(t *testing.T) {
 	}
 	if !found {
 		t.Errorf("Expected value %+v not found.", expected)
+	}
+}
+
+func TestGetBit(t *testing.T) {
+	for i := 0; i < 100; i++ { // 100 tests
+		geohash := rand.Int63()
+		bits := int64(0)
+		for position := int64(63); position >= 0; position-- {
+			bits *= 2
+			bits += getBit(geohash, position)
+		}
+		if geohash != bits {
+			t.Errorf("getBit() failed with %v != %v", geohash, bits)
+		}
 	}
 }
